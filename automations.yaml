@@ -1,0 +1,140 @@
+# automatische Zurücksetzen um den Stromzähler der Solvis am 01. April zurück-
+# zusetzen. 
+- alias: 'Alle Wärmepumpen-Zähler am 1. April zurücksetzen'
+  trigger:
+    - platform: time
+      at: '00:01:00'
+  condition:
+    - condition: template
+      value_template: "{{ now().month == 4 and now().day == 1 }}"
+  action:
+    - service: utility_meter.reset
+      target:
+        entity_id:
+          - sensor.waermepumpe_strom_jahr_aprilmarz
+          - sensor.waermepumpe_waermeerzeugung_jahr_aprilmarz
+          - sensor.waermepumpe_waermenutzung_hkr_jahr_aprilmarz
+          - sensor.waermepumpe_waermenutzung_ww_jahr_aprilmarz
+
+# Automation für Wärmepumpe Baseline Reset
+# Diese Automation setzt die Baseline-Werte zurück, wenn die Wärmepumpe von "off" auf "on" wechselt
+
+- id: "wp_baseline_reset_on_activation"
+  alias: "Wärmepumpe Baseline Reset bei Aktivierung"
+  description: "Setzt die Baseline-Werte für PV und Stromleser zurück, wenn die Wärmepumpe aktiviert wird"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.warmepumpe_ist_aktiv
+      from: "off"
+      to: "on"
+  action:
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.wp_baseline_pv_generation
+      data:
+        value: "{{ states('sensor.wechselrichter_gesamtenergieertrag')|float(0) }}"
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.wp_baseline_grid_export
+      data:
+        value: "{{ states('sensor.stromleser_01_e320_e_out')|float(0) }}"
+  mode: single
+
+# ***************************************************************************
+# kommt aus der evcc HACS
+- id: '1751008186543'
+  alias: 08:00Uhr
+  description: Der Schalter ist ein, wenn es 08:00 Uhr ist UND die Wirkleistung des
+    WR mindestens 1 kW beträgt
+  triggers:
+  - trigger: time
+    at: 09:45:00
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.wechselrichter_wirkleistung
+    above: 1000
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
+    target:
+      device_id: bc922b668a4da5084165ed94b1832f1d
+  - delay:
+      hours: 0
+      minutes: 29
+      seconds: 0
+      milliseconds: 0
+  - action: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      device_id: bc922b668a4da5084165ed94b1832f1d
+  mode: single
+- id: '1751021070362'
+  alias: '17:30'
+  description: Der Schalter ist ein, wenn es 17:30 Uhr ist UND die Wirkleistung des
+    WR mindestens 1 kW beträgt
+  triggers:
+  - trigger: time
+    at: '17:30:00'
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.wechselrichter_wirkleistung
+    above: 1000
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
+    target:
+      device_id: bc922b668a4da5084165ed94b1832f1d
+  - delay:
+      hours: 0
+      minutes: 29
+      seconds: 0
+      milliseconds: 0
+  - action: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      device_id: bc922b668a4da5084165ed94b1832f1d
+  mode: single
+- id: '1751178849401'
+  alias: Aus nach 30 Minuten
+  description: Die Steckdose schaltet automatisch nach 30 Minuten aus
+  triggers:
+  - type: turned_on
+    device_id: bc922b668a4da5084165ed94b1832f1d
+    entity_id: f62e72687d31ce8f7daf52d6931f52a9
+    domain: switch
+    trigger: device
+  conditions: []
+  actions:
+  - delay:
+      hours: 0
+      minutes: 29
+      seconds: 0
+      milliseconds: 0
+  - type: turn_off
+    device_id: bc922b668a4da5084165ed94b1832f1d
+    entity_id: f62e72687d31ce8f7daf52d6931f52a9
+    domain: switch
+  mode: single
+- id: '1753886651593'
+  alias: Laden wenn Preis am niedrigsten
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.epex_spot_data_lowest_price
+    attribute: price_per_kwh
+    above: 0
+    below: 5
+  conditions: []
+  actions:
+  - type: turn_on
+    device_id: bc922b668a4da5084165ed94b1832f1d
+    entity_id: f62e72687d31ce8f7daf52d6931f52a9
+    domain: switch
+  mode: single
+  # ENDE evcc HACS
+  # **************************************************************************
