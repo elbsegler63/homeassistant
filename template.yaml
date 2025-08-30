@@ -278,7 +278,7 @@
           {% set result = (pv_diff - out_diff) %}
           {{ result | round(3) if result >= 0 else 0 }}
         {% else %}
-          {{ states('sensor.zahler_pv_fuer_warmepumpe')|float(0) }}
+          {{ this.state | float(0) }}
         {% endif %}
       attributes:
         current_pv_generation: "{{ states('sensor.wechselrichter_gesamtenergieertrag') }}"
