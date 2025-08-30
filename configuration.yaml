@@ -1,0 +1,238 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+# eigene Sensoren einbinden
+
+# template: !include template.yaml
+
+homeassistant:
+  customize: !include customize.yaml
+
+# Sensoren
+# sensor: !include sensors.yaml
+
+# Templates
+template: !include template.yaml
+
+
+
+# Utility Meter
+# utility_meter: !include utility_meter.yaml
+
+# Weitere Komponenten nach Bedarf
+# automation: !include automations.yaml
+# script: !include scripts.yaml
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Cloudfare Addon Konfi Simon42
+http:
+  cors_allowed_origins:
+    - https://google.com
+    - https://www.home-assistant.io
+  ip_ban_enabled: true
+  login_attempts_threshold: 5
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.33.0/24
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# ******************************************************************************
+# Stromleser Zählerstände von reinen Zahlen in kWh transormieren und nutzbar machen
+
+#homeassistant:
+#  customize:
+#    sensor.stromleser_01_e320_e_in:
+#      state_class: total_increasing
+#      unit_of_measurement: kWh
+#      device_class: energy
+#    sensor.stromleser_01_e320_e_out:
+#      state_class: total_increasing
+#      unit_of_measurement: kWh
+#      device_class: energy
+# ******************************************************************************
+      
+# Integrationen      
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Umwandlung kW in kWh durch Integral-Bildung Riemann
+sensor:
+  - platform: integration
+    source: sensor.warmepumpe_zs16_warmepumpe_leistungsaufnahme_elektrisch
+    name: hilfssensor_warmepumpe_aufnahme_strom_menge
+    round: 3
+    method: trapezoidal
+    unique_id: hilfssensor_warmepumpe_aufnahme_strom_menge_id
+#    state_class: total_increasing
+#   unit_of_measurement: kWh
+#    device_class: energy
+    
+
+  - platform: integration
+    source: sensor.warmepumpe_zs16_warmepumpe_leistung_thermisch
+    name: hilfssensor_warmepumpe_erzeugung_warme_menge
+    round: 3
+    method: trapezoidal
+    unique_id: hilfssensor_warmepumpe_erzeugung_warme_menge_id
+#    state_class: total_increasing
+#    unit_of_measurement: kWh
+#    device_class: energy
+    
+  - platform: integration
+    source: sensor.warmepumpe_zs16_warmwasser_leistung
+    name: hilfssensor_warmepumpe_genutztes_warmwasser_menge
+    round: 3
+    method: trapezoidal
+    unique_id: hilfssensor_warmepumpe_genutztes_warmwasser_menge_id
+#    state_class: total_increasing
+#    unit_of_measurement: kWh
+#    device_class: energy
+
+# *****************************************************************************
+# Guten Tag. Ich habe folgenden TEMPARATUR-Sensor gefunden:
+# 
+  - platform: statistics
+    name: "Min AussenTemperatur 24 Stunden"
+    unique_id: aussentemperatur_minimum_24_stunden_id
+    entity_id: sensor.warmepumpe_zs16_aussentemperatur_s10
+    state_characteristic: value_min
+    max_age: "24:00:00"
+ 
+# Als Hefer angelegt 
+#   - platform: statistics
+#     name: "Durchschnitt Temperatur 1 Woche"
+#     unique_id: temperatur_durchschnitt_1_woche_id
+#     entity_id: sensor.warmepumpe_zs16_aussentemperatur_s10
+#     state_characteristic: value_max
+#     max_age: "168:00:00"
+    
+
+
+
+
+# Solvis Mengenzähler als utility_meter
+utility_meter:
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Solvis Mengenzähler für ein Kalenderjahr
+# rollierend: 01. Aprl bis 31. März!
+# Dazu gibt es dann Automationen! in der automation.yaml
+# Achtung: Es gibt auch einen Sesnoren für ein Kalenderjahr Jan. bis Dez.
+# 1. Strom Aufnahme
+  waermepumpe_strom_jahr_aprilmarz:
+    source: sensor.hilfssensor_warmepumpe_aufnahme_strom_menge
+    name: "Wärmepumpe Stromverbrauch Jahr April-März"
+    unique_id: waermepumpe_stromverbrauch_jahr_aprilmarz_id
+# 2. Wärmeerzeugung
+  waermepumpe_waermeerzeugung_jahr_aprilmarz:
+    source: sensor.hilfssensor_warmepumpe_erzeugung_warme_menge
+    name: "Wärmepumpe Wärmeerzeugung Jahr April-März"
+    unique_id: waermepumpe_waermeerzeugung_jahr_aprilmarz_id
+# 3. Wärmenutzung HKR
+  waermepumpe_waermenutzung_hkr_jahr_aprilmarz:
+    source: sensor.warmepumpe_zs16_heizkreise_warmemenge
+    name: "Wärmepumpe Wärmenutzung HKR Jahr April-März"
+    unique_id: waermepumpe_waermenutzung_hkr_jahr_aprilmarz_id
+# 4. Wämenutzung Warmwasser WW
+  waermepumpe_waermenutzung_ww_jahr_aprilmarz:
+    source: sensor.hilfssensor_warmepumpe_genutztes_warmwasser_menge
+    name: "Wärmepumpe Wärmenutzung WW Jahr April-März"
+    unique_id: waermepumpe_waermenutzung_ww_jahr_aprilmarz_id
+
+# Solvis Mengenzähler für ein Kalenderjahr:
+# 2. Wärmeerzeugung
+  waermepumpe_waermeerzeugung_jahr_kalender:
+    source: sensor.hilfssensor_warmepumpe_erzeugung_warme_menge
+    cycle: yearly
+    name: "Wärmepumpe Wärmeerzeugung Kalender-Jahr"
+    unique_id: waermepumpe_waermeerzeugung_jahr_kaleder_id
+# *****************************************************************************
+
+# -Aufnahme Strom Wärmepumpe monatlich
+  solvis_warmepumpe_strom_menge_monat:
+    source: sensor.hilfssensor_warmepumpe_aufnahme_strom_menge
+    cycle: monthly
+    name: "Solvis Wärmepumpe Stromverbrauch Monat"
+    unique_id: solvis_warmepumpe_stromverbrauch_monat_id
+
+
+# Solvis thermische Erzeugung monatlich V2 
+# Die Source steht oben unter Integrationen
+# - Wärmepumpe
+  solvis_warmepumpe_thermisch_menge_monat:
+    source: sensor.hilfssensor_warmepumpe_erzeugung_warme_menge
+    cycle: monthly
+    name: "Solvis Wärmepumpe Erzeugung thermische Wärme Monat"
+    unique_id: solvis_warmepumpe_erzeugung_thermisch_monat_id
+    
+
+# Solvis Wärmepumpe genutztes Warmwasser monatlich
+# Die Source steht oben unter Integrationen
+  solvis_warmepumpe_genutztes_warmwasser_monat:
+    source: sensor.hilfssensor_warmepumpe_genutztes_warmwasser_menge
+    cycle: monthly
+    name: "Solvis Wärmepumpe genutztes Warmwasser monatlich"
+    unique_id: solvis_warmepumpe_genutztes_warmwasser_monat_id
+    
+# ******************************************************************************
+    
+# Solvis Mengenzähler täglich 
+# -Aufnahme Strom Wärmepumpe täglich
+  solvis_warmepumpe_strom_menge_tag:
+    source: sensor.hilfssensor_warmepumpe_aufnahme_strom_menge
+    cycle: daily
+    name: "Solvis Wärmepumpe Stromverbrauch Tag"
+    unique_id: solvis_warmepumpe_stromverbrauch_tag_id
+
+
+# Solvis thermische Erzeugung täglich  
+# Die Source steht oben unter Integrationen
+# - Wärmepumpe
+  solvis_warmepumpe_erzeugung_thermisch_menge_tag:
+    source: sensor.hilfssensor_warmepumpe_erzeugung_warme_menge
+    cycle: daily
+    name: "Solvis Wärmepumpe Erzeugung thermische Wärme Tag"
+    unique_id: solvis_warmepumpe_erzeugung_thermisch_tag_id
+    
+
+# Solvis Wärmepumpe genutztes Warmwasser täglich
+# Die Source steht oben unter Integrationen
+  solvis_warmepumpe_genutztes_warmwasser_tag:
+    source: sensor.hilfssensor_warmepumpe_genutztes_warmwasser_menge
+    cycle: daily
+    name: "Solvis Wärmepumpe genutztes Warmwasser Tag"
+    unique_id: solvis_warmepumpe_genutztes_warmwasser_tag_id
+
+# Solvis Wärmepumpe genutzte Wärme in den Heizkreisen HKR täglich
+  solvis_warmepumpe_genutzte_warme_hkr_tag:
+    source: sensor.warmepumpe_zs16_heizkreise_warmemenge
+    cycle: daily
+    name: "Solvis Wärmepumpe genutzte Wärme HKR Tag"
+    unique_id: solvis_warmepumpe_genutzte_warme_hkr_tag_id
+    
+# ******************************************************************************
+# ******************************************************************************
+# Utility Meter für das Delta PV Erzeugug minus Einspeisung wenn die Wärmepumpe arbeitet.
+# zur Annäherung an die Strommenge für die WP, die wir selbst erzeugen.
+  pv_fuer_warmepumpe_tageszaehler:
+    source: sensor.zahler_pv_fuer_warmepumpe
+    cycle: daily
+    name: "PV für Wärmepumpe Tageszähler"
+    unique_id: pv_fuer_warmepumpe_tageszaehler_id
+    
+  pv_fuer_warmepumpe_monatszaehler:
+    source: sensor.zahler_pv_fur_warmepumpe
+    cycle: monthly
+    name: "PV für Wärmepumpe Monatszähler"
+    unique_id: pv_fuer_warmepumpe_monatszaehler_id
+# ******************************************************************************
+# ******************************************************************************
+
+
+
+ 
