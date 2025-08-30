@@ -1,0 +1,23 @@
+# Automation für Wärmepumpe Baseline Reset
+# Diese Automation setzt die Baseline-Werte zurück, wenn die Wärmepumpe von "off" auf "on" wechselt
+
+- id: "wp_baseline_reset_on_activation"
+  alias: "Wärmepumpe Baseline Reset bei Aktivierung"
+  description: "Setzt die Baseline-Werte für PV und Stromleser zurück, wenn die Wärmepumpe aktiviert wird"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.warmepumpe_ist_aktiv
+      from: "off"
+      to: "on"
+  action:
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.wp_baseline_pv_generation
+      data:
+        value: "{{ states('sensor.wechselrichter_gesamtenergieertrag')|float(0) }}"
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.wp_baseline_grid_export
+      data:
+        value: "{{ states('sensor.stromleser_01_e320_e_out')|float(0) }}"
+  mode: single

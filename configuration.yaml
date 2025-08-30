@@ -5,6 +5,24 @@ default_config:
 frontend:
   themes: !include_dir_merge_named themes
 
+# Input number helpers for baseline tracking
+input_number:
+  wp_baseline_pv_generation:
+    name: "WP Baseline PV Generation"
+    min: 0
+    max: 999999
+    step: 0.001
+    unit_of_measurement: kWh
+    mode: box
+    
+  wp_baseline_grid_export:
+    name: "WP Baseline Grid Export"
+    min: 0
+    max: 999999
+    step: 0.001
+    unit_of_measurement: kWh
+    mode: box
+
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
@@ -226,7 +244,7 @@ utility_meter:
     unique_id: pv_fuer_warmepumpe_tageszaehler_id
     
   pv_fuer_warmepumpe_monatszaehler:
-    source: sensor.zahler_pv_fur_warmepumpe
+    source: sensor.zahler_pv_fuer_warmepumpe
     cycle: monthly
     name: "PV für Wärmepumpe Monatszähler"
     unique_id: pv_fuer_warmepumpe_monatszaehler_id
