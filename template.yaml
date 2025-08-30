@@ -258,17 +258,34 @@
 
 #******************************************************************************************************
 #******************************************************************************************************
-# Wenn die WP aktiv ist, wird die Differenz zwischen der erzeugten Solarstrommenge und der eingespeisten Srommenge gebildet.
-# Hieraus werden dann die Tages und Monatswerte für die Utility_Meter in der configuration.yaml genutzt.
+# Incrementelle Energiezähler für Wärmepumpe
+# Diese Sensoren tracken die Energiemengen, die während der Laufzeit der Wärmepumpe verbraucht/erzeugt werden
+
 - sensor:
     - name: "Zähler PV für Wärmepumpe"
       unique_id: zahler_pv_fuer_warmepumpe
       unit_of_measurement: kWh
+      device_class: energy
+      state_class: total_increasing
       state: >
-        {% if is_state('binary_sensor.warmepumpe_aktiv', 'on') %}
-          {{ (states('sensor.wechselrichter_gesamtenergieertrag')|float(0) - states('sensor.stromleser_01_e320_e_out')|float(0)) | round(3) }}
+        {% if is_state('binary_sensor.warmepumpe_ist_aktiv', 'on') %}
+          {% set current_pv = states('sensor.wechselrichter_gesamtenergieertrag')|float(0) %}
+          {% set current_out = states('sensor.stromleser_01_e320_e_out')|float(0) %}
+          {% set baseline_pv = states('input_number.wp_baseline_pv_generation')|float(0) %}
+          {% set baseline_out = states('input_number.wp_baseline_grid_export')|float(0) %}
+          {% set pv_diff = (current_pv - baseline_pv) %}
+          {% set out_diff = (current_out - baseline_out) %}
+          {% set result = (pv_diff - out_diff) %}
+          {{ result | round(3) if result >= 0 else 0 }}
         {% else %}
-          0
+          {{ states('sensor.zahler_pv_fuer_warmepumpe')|float(0) }}
         {% endif %}
+      attributes:
+        current_pv_generation: "{{ states('sensor.wechselrichter_gesamtenergieertrag') }}"
+        current_grid_export: "{{ states('sensor.stromleser_01_e320_e_out') }}"
+        baseline_pv_generation: "{{ states('input_number.wp_baseline_pv_generation') }}"
+        baseline_grid_export: "{{ states('input_number.wp_baseline_grid_export') }}"
+        pv_increment: "{{ (states('sensor.wechselrichter_gesamtenergieertrag')|float(0) - states('input_number.wp_baseline_pv_generation')|float(0)) | round(3) }}"
+        export_increment: "{{ (states('sensor.stromleser_01_e320_e_out')|float(0) - states('input_number.wp_baseline_grid_export')|float(0)) | round(3) }}"
 #******************************************************************************************************
 #******************************************************************************************************
