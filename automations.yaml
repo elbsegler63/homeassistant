@@ -40,6 +40,23 @@
         value: "{{ states('sensor.stromleser_01_e320_e_out')|float(0) }}"
   mode: single
 
+# Wärmepumpe PV Zähler akkumulieren bei Deaktivierung
+- id: "wp_accumulate_pv_counter_on_deactivation"
+  alias: "Wärmepumpe PV Zähler akkumulieren bei Deaktivierung"
+  description: "Speichert den aktuellen PV-Zählerwert, wenn die Wärmepumpe deaktiviert wird"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.warmepumpe_ist_aktiv
+      from: "on"
+      to: "off"
+  action:
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.wp_accumulated_pv_counter
+      data:
+        value: "{{ states('sensor.zahler_pv_fuer_warmepumpe')|float(0) }}"
+  mode: single
+
 # ***************************************************************************
 # kommt aus der evcc HACS
 - id: '1751008186543'
