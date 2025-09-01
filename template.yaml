@@ -330,3 +330,36 @@
         export_increment: "{{ (states('sensor.stromleser_01_e320_e_out')|float(0) - states('input_number.wp_baseline_grid_export')|float(0)) | round(3) }}"
 #******************************************************************************************************
 #******************************************************************************************************
+
+# Template-Sensor für 7-Tage Wärmepumpe Wechsel Übersicht
+- sensor:
+    - name: "Wärmepumpe Wechsel 7 Tage Übersicht"
+      unique_id: warmepumpe_wechsel_7_tage_uebersicht_id
+      icon: mdi:chart-bar
+      state: >
+        {% set heute = states('sensor.warmepumpe_wechsel_heute') | int(0) %}
+        {% set gestern = states('sensor.warmepumpe_wechsel_gestern') | int(0) %}
+        {% set tag_2 = states('sensor.warmepumpe_wechsel_tag_minus_2') | int(0) %}
+        {% set tag_3 = states('sensor.warmepumpe_wechsel_tag_minus_3') | int(0) %}
+        {% set tag_4 = states('sensor.warmepumpe_wechsel_tag_minus_4') | int(0) %}
+        {% set tag_5 = states('sensor.warmepumpe_wechsel_tag_minus_5') | int(0) %}
+        {% set tag_6 = states('sensor.warmepumpe_wechsel_tag_minus_6') | int(0) %}
+        {% set tag_7 = states('sensor.warmepumpe_wechsel_tag_minus_7') | int(0) %}
+        {{ (heute + gestern + tag_2 + tag_3 + tag_4 + tag_5 + tag_6 + tag_7) / 7 }}
+      attributes:
+        heute: "{{ states('sensor.warmepumpe_wechsel_heute') }}"
+        gestern: "{{ states('sensor.warmepumpe_wechsel_gestern') }}"
+        tag_minus_2: "{{ states('sensor.warmepumpe_wechsel_tag_minus_2') }}"
+        tag_minus_3: "{{ states('sensor.warmepumpe_wechsel_tag_minus_3') }}"
+        tag_minus_4: "{{ states('sensor.warmepumpe_wechsel_tag_minus_4') }}"
+        tag_minus_5: "{{ states('sensor.warmepumpe_wechsel_tag_minus_5') }}"
+        tag_minus_6: "{{ states('sensor.warmepumpe_wechsel_tag_minus_6') }}"
+        tag_minus_7: "{{ states('sensor.warmepumpe_wechsel_tag_minus_7') }}"
+        datum_heute: "{{ now().strftime('%d.%m.%Y') }}"
+        datum_gestern: "{{ (now() - timedelta(days=1)).strftime('%d.%m.%Y') }}"
+        datum_tag_2: "{{ (now() - timedelta(days=2)).strftime('%d.%m.%Y') }}"
+        datum_tag_3: "{{ (now() - timedelta(days=3)).strftime('%d.%m.%Y') }}"
+        datum_tag_4: "{{ (now() - timedelta(days=4)).strftime('%d.%m.%Y') }}"
+        datum_tag_5: "{{ (now() - timedelta(days=5)).strftime('%d.%m.%Y') }}"
+        datum_tag_6: "{{ (now() - timedelta(days=6)).strftime('%d.%m.%Y') }}"
+        datum_tag_7: "{{ (now() - timedelta(days=7)).strftime('%d.%m.%Y') }}"

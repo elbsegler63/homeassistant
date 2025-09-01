@@ -5,6 +5,17 @@ default_config:
 frontend:
   themes: !include_dir_merge_named themes
 
+# Dashboard configuration
+lovelace:
+  mode: yaml
+  dashboards:
+    warmepumpe-dashboard:
+      mode: yaml
+      title: Wärmepumpe
+      icon: mdi:heat-pump
+      show_in_sidebar: true
+      filename: dashboard_warmepumpe.yaml
+
 # Input number helpers for baseline tracking
 input_number:
   wp_baseline_pv_generation:
@@ -183,6 +194,61 @@ sensor:
     type: time
     start: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)) }}'
     end: '{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}'
+
+  # Anzahl der Ein-Zyklen (off->on Wechsel) für die letzten 7 Tage - für Diagramm
+  - platform: history_stats
+    name: "Wärmepumpe Wechsel Tag -2"
+    unique_id: warmepumpe_wechsel_tag_minus_2_id
+    entity_id: binary_sensor.warmepumpe_ist_aktiv
+    state: 'on'
+    type: count
+    start: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=2)) }}'
+    end: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)) }}'
+
+  - platform: history_stats
+    name: "Wärmepumpe Wechsel Tag -3"
+    unique_id: warmepumpe_wechsel_tag_minus_3_id
+    entity_id: binary_sensor.warmepumpe_ist_aktiv
+    state: 'on'
+    type: count
+    start: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=3)) }}'
+    end: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=2)) }}'
+
+  - platform: history_stats
+    name: "Wärmepumpe Wechsel Tag -4"
+    unique_id: warmepumpe_wechsel_tag_minus_4_id
+    entity_id: binary_sensor.warmepumpe_ist_aktiv
+    state: 'on'
+    type: count
+    start: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=4)) }}'
+    end: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=3)) }}'
+
+  - platform: history_stats
+    name: "Wärmepumpe Wechsel Tag -5"
+    unique_id: warmepumpe_wechsel_tag_minus_5_id
+    entity_id: binary_sensor.warmepumpe_ist_aktiv
+    state: 'on'
+    type: count
+    start: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=5)) }}'
+    end: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=4)) }}'
+
+  - platform: history_stats
+    name: "Wärmepumpe Wechsel Tag -6"
+    unique_id: warmepumpe_wechsel_tag_minus_6_id
+    entity_id: binary_sensor.warmepumpe_ist_aktiv
+    state: 'on'
+    type: count
+    start: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=6)) }}'
+    end: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=5)) }}'
+
+  - platform: history_stats
+    name: "Wärmepumpe Wechsel Tag -7"
+    unique_id: warmepumpe_wechsel_tag_minus_7_id
+    entity_id: binary_sensor.warmepumpe_ist_aktiv
+    state: 'on'
+    type: count
+    start: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=7)) }}'
+    end: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=6)) }}'
 
 # *****************************************************************************
 

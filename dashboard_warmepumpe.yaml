@@ -1,0 +1,142 @@
+title: Wärmepumpe Dashboard
+views:
+  - title: Wärmepumpe Statistiken
+    path: warmepumpe-stats
+    icon: mdi:heat-pump
+    cards:
+      - type: history-graph
+        title: "Wärmepumpe Wechsel - Letzte 7 Tage"
+        hours_to_show: 168
+        refresh_interval: 60
+        entities:
+          - entity: sensor.warmepumpe_wechsel_tag_minus_7
+            name: "Tag -7"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_6
+            name: "Tag -6"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_5
+            name: "Tag -5"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_4
+            name: "Tag -4"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_3
+            name: "Tag -3"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_2
+            name: "Tag -2"
+          - entity: sensor.warmepumpe_wechsel_gestern
+            name: "Gestern"
+          - entity: sensor.warmepumpe_wechsel_heute
+            name: "Heute"
+      
+      - type: horizontal-stack
+        cards:
+          - type: statistic
+            entity: sensor.warmepumpe_wechsel_heute
+            name: "Wechsel heute"
+            icon: mdi:counter
+          - type: statistic
+            entity: sensor.warmepumpe_wechsel_gestern
+            name: "Wechsel gestern"
+            icon: mdi:counter
+          - type: statistic
+            entity: sensor.warmepumpe_wechsel_7_tage_uebersicht
+            name: "Ø Wechsel/Tag"
+            icon: mdi:chart-line
+
+      - type: entities
+        title: "Wärmepumpe Wechsel Übersicht - Letzte 7 Tage"
+        entities:
+          - type: attribute
+            entity: sensor.warmepumpe_wechsel_7_tage_ubersicht
+            attribute: datum_heute
+            name: "Heute"
+            suffix: ":"
+          - entity: sensor.warmepumpe_wechsel_heute
+            name: "  → Anzahl Wechsel"
+          - type: attribute
+            entity: sensor.warmepumpe_wechsel_7_tage_ubersicht
+            attribute: datum_gestern
+            name: "Gestern"
+            suffix: ":"
+          - entity: sensor.warmepumpe_wechsel_gestern
+            name: "  → Anzahl Wechsel"
+          - type: attribute
+            entity: sensor.warmepumpe_wechsel_7_tage_ubersicht
+            attribute: datum_tag_2
+            name: "Tag -2"
+            suffix: ":"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_2
+            name: "  → Anzahl Wechsel"
+          - type: attribute
+            entity: sensor.warmepumpe_wechsel_7_tage_ubersicht
+            attribute: datum_tag_3
+            name: "Tag -3"
+            suffix: ":"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_3
+            name: "  → Anzahl Wechsel"
+          - type: attribute
+            entity: sensor.warmepumpe_wechsel_7_tage_ubersicht
+            attribute: datum_tag_4
+            name: "Tag -4"
+            suffix: ":"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_4
+            name: "  → Anzahl Wechsel"
+          - type: attribute
+            entity: sensor.warmepumpe_wechsel_7_tage_ubersicht
+            attribute: datum_tag_5
+            name: "Tag -5"
+            suffix: ":"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_5
+            name: "  → Anzahl Wechsel"
+          - type: attribute
+            entity: sensor.warmepumpe_wechsel_7_tage_ubersicht
+            attribute: datum_tag_6
+            name: "Tag -6"
+            suffix: ":"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_6
+            name: "  → Anzahl Wechsel"
+          - type: attribute
+            entity: sensor.warmepumpe_wechsel_7_tage_ubersicht
+            attribute: datum_tag_7
+            name: "Tag -7"
+            suffix: ":"
+          - entity: sensor.warmepumpe_wechsel_tag_minus_7
+            name: "  → Anzahl Wechsel"
+
+      - type: entities
+        title: "Weitere Wärmepumpe Statistiken"
+        entities:
+          - entity: binary_sensor.warmepumpe_ist_aktiv
+            name: "Wärmepumpe Status"
+          - entity: sensor.warmepumpe_durchschnittliche_on_dauer_heute
+            name: "Ø On-Dauer heute"
+          - entity: sensor.warmepumpe_durchschnittliche_on_dauer_gestern
+            name: "Ø On-Dauer gestern"
+
+      - type: markdown
+        title: "Wärmepumpe Wechsel - Tabelle Letzte 7 Tage"
+        content: |
+          | Datum | Wechsel |
+          |-------|---------|
+          | {{ state_attr('sensor.warmepumpe_wechsel_7_tage_uebersicht', 'datum_heute') }} (Heute) | {{ states('sensor.warmepumpe_wechsel_heute') }} |
+          | {{ state_attr('sensor.warmepumpe_wechsel_7_tage_uebersicht', 'datum_gestern') }} (Gestern) | {{ states('sensor.warmepumpe_wechsel_gestern') }} |
+          | {{ state_attr('sensor.warmepumpe_wechsel_7_tage_uebersicht', 'datum_tag_2') }} | {{ states('sensor.warmepumpe_wechsel_tag_minus_2') }} |
+          | {{ state_attr('sensor.warmepumpe_wechsel_7_tage_uebersicht', 'datum_tag_3') }} | {{ states('sensor.warmepumpe_wechsel_tag_minus_3') }} |
+          | {{ state_attr('sensor.warmepumpe_wechsel_7_tage_uebersicht', 'datum_tag_4') }} | {{ states('sensor.warmepumpe_wechsel_tag_minus_4') }} |
+          | {{ state_attr('sensor.warmepumpe_wechsel_7_tage_uebersicht', 'datum_tag_5') }} | {{ states('sensor.warmepumpe_wechsel_tag_minus_5') }} |
+          | {{ state_attr('sensor.warmepumpe_wechsel_7_tage_uebersicht', 'datum_tag_6') }} | {{ states('sensor.warmepumpe_wechsel_tag_minus_6') }} |
+          | {{ state_attr('sensor.warmepumpe_wechsel_7_tage_uebersicht', 'datum_tag_7') }} | {{ states('sensor.warmepumpe_wechsel_tag_minus_7') }} |
+          
+          **Durchschnitt pro Tag:** {{ states('sensor.warmepumpe_wechsel_7_tage_uebersicht') | round(1) }}
+
+      - type: entities
+        title: "Aktuelle Werte"
+        entities:
+          - entity: sensor.warmepumpe_wechsel_heute
+            name: "Wechsel heute"
+          - entity: sensor.warmepumpe_wechsel_gestern
+            name: "Wechsel gestern"
+          - entity: binary_sensor.warmepumpe_ist_aktiv
+            name: "Wärmepumpe Status"
+          - entity: sensor.warmepumpe_durchschnittliche_on_dauer_heute
+            name: "Ø On-Dauer heute"
+          - entity: sensor.warmepumpe_durchschnittliche_on_dauer_gestern
+            name: "Ø On-Dauer gestern"
