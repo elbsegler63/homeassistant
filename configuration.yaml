@@ -130,7 +130,7 @@ sensor:
     entity_id: sensor.warmepumpe_zs16_aussentemperatur_s10
     state_characteristic: value_min
     max_age: "24:00:00"
- 
+
 # Als Hefer angelegt 
 #   - platform: statistics
 #     name: "Durchschnitt Temperatur 1 Woche"
@@ -138,6 +138,52 @@ sensor:
 #     entity_id: sensor.warmepumpe_zs16_aussentemperatur_s10
 #     state_characteristic: value_max
 #     max_age: "168:00:00"
+
+# *****************************************************************************
+# Wärmepumpe Statistik-Sensoren für Wechsel und Laufzeiten
+# *****************************************************************************
+
+  # Anzahl der Ein-Zyklen (off->on Wechsel) heute
+  - platform: history_stats
+    name: "Wärmepumpe Wechsel heute"
+    unique_id: warmepumpe_wechsel_heute_id
+    entity_id: binary_sensor.warmepumpe_ist_aktiv
+    state: 'on'
+    type: count
+    start: '{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}'
+    end: '{{ now() }}'
+
+  # Anzahl der Ein-Zyklen (off->on Wechsel) gestern  
+  - platform: history_stats
+    name: "Wärmepumpe Wechsel gestern"
+    unique_id: warmepumpe_wechsel_gestern_id
+    entity_id: binary_sensor.warmepumpe_ist_aktiv
+    state: 'on'
+    type: count
+    start: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)) }}'
+    end: '{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}'
+
+  # Gesamtdauer der On-Phasen heute (für Durchschnittsberechnung)
+  - platform: history_stats
+    name: "Wärmepumpe Gesamtlaufzeit heute"
+    unique_id: warmepumpe_gesamtlaufzeit_heute_id
+    entity_id: binary_sensor.warmepumpe_ist_aktiv
+    state: 'on'
+    type: time
+    start: '{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}'
+    end: '{{ now() }}'
+
+  # Gesamtdauer der On-Phasen gestern (für Durchschnittsberechnung)
+  - platform: history_stats
+    name: "Wärmepumpe Gesamtlaufzeit gestern"
+    unique_id: warmepumpe_gesamtlaufzeit_gestern_id
+    entity_id: binary_sensor.warmepumpe_ist_aktiv
+    state: 'on'
+    type: time
+    start: '{{ (now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)) }}'
+    end: '{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}'
+
+# *****************************************************************************
     
 
 
