@@ -257,6 +257,44 @@
       device_class: running
 
 #******************************************************************************************************
+# Statistik-Sensoren für Wärmepumpe - Durchschnittliche Laufzeiten
+#******************************************************************************************************
+- sensor:
+    # Durchschnittliche Dauer der On-Phasen heute in Minuten
+    - name: "Wärmepumpe durchschnittliche On-Dauer heute"
+      unique_id: warmepumpe_durchschnitt_on_dauer_heute_id
+      icon: mdi:timer-outline
+      unit_of_measurement: "min"
+      state: >
+        {% set zyklen = states('sensor.warmepumpe_wechsel_heute') | float(0) %}
+        {% set gesamtzeit = states('sensor.warmepumpe_gesamtlaufzeit_heute') | float(0) %}
+        {% if zyklen > 0 %}
+          {{ (gesamtzeit * 60 / zyklen) | round(1) }}
+        {% else %}
+          0
+        {% endif %}
+      attributes:
+        zyklen_heute: "{{ states('sensor.warmepumpe_wechsel_heute') }}"
+        gesamtlaufzeit_heute_h: "{{ states('sensor.warmepumpe_gesamtlaufzeit_heute') }}"
+
+    # Durchschnittliche Dauer der On-Phasen gestern in Minuten
+    - name: "Wärmepumpe durchschnittliche On-Dauer gestern"
+      unique_id: warmepumpe_durchschnitt_on_dauer_gestern_id  
+      icon: mdi:timer-outline
+      unit_of_measurement: "min"
+      state: >
+        {% set zyklen = states('sensor.warmepumpe_wechsel_gestern') | float(0) %}
+        {% set gesamtzeit = states('sensor.warmepumpe_gesamtlaufzeit_gestern') | float(0) %}
+        {% if zyklen > 0 %}
+          {{ (gesamtzeit * 60 / zyklen) | round(1) }}
+        {% else %}
+          0
+        {% endif %}
+      attributes:
+        zyklen_gestern: "{{ states('sensor.warmepumpe_wechsel_gestern') }}"
+        gesamtlaufzeit_gestern_h: "{{ states('sensor.warmepumpe_gesamtlaufzeit_gestern') }}"
+
+#******************************************************************************************************
 #******************************************************************************************************
 # Incrementelle Energiezähler für Wärmepumpe
 # Diese Sensoren tracken die Energiemengen, die während der Laufzeit der Wärmepumpe verbraucht/erzeugt werden
