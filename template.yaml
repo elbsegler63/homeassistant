@@ -273,18 +273,21 @@
           {% set current_out = states('sensor.stromleser_01_e320_e_out')|float(0) %}
           {% set baseline_pv = states('input_number.wp_baseline_pv_generation')|float(0) %}
           {% set baseline_out = states('input_number.wp_baseline_grid_export')|float(0) %}
+          {% set accumulated = states('input_number.wp_accumulated_pv_counter')|float(0) %}
           {% set pv_diff = (current_pv - baseline_pv) %}
           {% set out_diff = (current_out - baseline_out) %}
-          {% set result = (pv_diff - out_diff) %}
-          {{ result | round(3) if result >= 0 else 0 }}
+          {% set increment = (pv_diff - out_diff) %}
+          {% set result = accumulated + (increment if increment >= 0 else 0) %}
+          {{ result | round(3) }}
         {% else %}
-          {{ states('sensor.zahler_pv_fuer_warmepumpe')|float(0) }}
+          {{ states('input_number.wp_accumulated_pv_counter')|float(0) }}
         {% endif %}
       attributes:
         current_pv_generation: "{{ states('sensor.wechselrichter_gesamtenergieertrag') }}"
         current_grid_export: "{{ states('sensor.stromleser_01_e320_e_out') }}"
         baseline_pv_generation: "{{ states('input_number.wp_baseline_pv_generation') }}"
         baseline_grid_export: "{{ states('input_number.wp_baseline_grid_export') }}"
+        accumulated_counter: "{{ states('input_number.wp_accumulated_pv_counter') }}"
         pv_increment: "{{ (states('sensor.wechselrichter_gesamtenergieertrag')|float(0) - states('input_number.wp_baseline_pv_generation')|float(0)) | round(3) }}"
         export_increment: "{{ (states('sensor.stromleser_01_e320_e_out')|float(0) - states('input_number.wp_baseline_grid_export')|float(0)) | round(3) }}"
 #******************************************************************************************************
